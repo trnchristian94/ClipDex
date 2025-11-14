@@ -1,8 +1,8 @@
 # 🎮 ClipDex
 
-> **Your gaming highlights, beautifully organized.**
+> **Your gaming highlights, unified and organized.**
 
-ClipDex is a modern web platform that allows gamers to upload, organize, and share their best gameplay moments. Think of it as a personal portfolio for your gaming achievements, powered by YouTube's infrastructure.
+ClipDex is a modern web platform that allows gamers to connect their video platforms (YouTube, Twitch, Vimeo) and showcase all their clips in one beautiful portfolio. Think of it as Linktree for gaming content, where you control your videos and ClipDex organizes them.
 
 [![Next.js](https://img.shields.io/badge/Next.js-14+-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
