@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { AuthOptions } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import GoogleProvider from "next-auth/providers/google";
 import TwitchProvider from "next-auth/providers/twitch";
@@ -7,7 +7,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     DiscordProvider({
@@ -84,27 +84,36 @@ export const authOptions = {
           id: user.id,
           email: user.email,
           username: user.username,
-          displayName: user.displayName,
-          avatarUrl: user.avatarUrl,
+          name: user.displayName,
+          image: user.avatarUrl,
         };
       },
     }),
   ],
   callbacks: {
-    session: async ({ session, user }: any) => {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.username = (user as any).username;
+      }
+      return token;
+    },
+    async session({ session, token }) {
       if (session?.user) {
-        session.user.id = user.id;
-        session.user.username = user.username;
+        (session.user as any).id = token.id;
+        (session.user as any).username = token.username;
       }
       return session;
     },
   },
   pages: {
     signIn: "/login",
+    error: "/login", // Redirigir errores a login
   },
   session: {
-    strategy: "jwt" as const, // Cambiado a JWT para credentials
+    strategy: "jwt",
   },
+  debug: process.env.NODE_ENV === "development", // Ver logs en desarrollo
 };
 
 const handler = NextAuth(authOptions);

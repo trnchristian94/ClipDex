@@ -2,7 +2,8 @@
 
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [showEmailForm, setShowEmailForm] = useState(false);
@@ -10,6 +11,23 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (searchParams.get("registered") === "true") {
+      setSuccessMessage("Account created successfully! Please sign in.");
+      setShowEmailForm(true);
+    }
+    
+    // Manejar errores de NextAuth
+    const authError = searchParams.get("error");
+    if (authError) {
+      setError("Authentication failed. Please try again.");
+    }
+  }, [searchParams]);
 
   const providers = [
     {
@@ -46,17 +64,26 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-    if (result?.error) {
-      setError("Invalid email or password");
+      console.log("Login result:", result);
+
+      if (result?.error) {
+        setError("Invalid email or password");
+        setIsLoading(false);
+      } else if (result?.ok) {
+        // Redirigir manualmente
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("An error occurred. Please try again.");
       setIsLoading(false);
-    } else {
-      window.location.href = "/dashboard";
     }
   };
 
@@ -68,11 +95,20 @@ export default function LoginPage() {
             🎮 <span className="text-purple-400">ClipDex</span>
           </h1>
           <p className="text-gray-400">Your gaming portfolio, unified</p>
+
+          <p className="text-sm text-gray-500 mt-4">
+            Don't have an account?{" "}
+            <Link
+              href="/register"
+              className="text-purple-400 hover:underline cursor-pointer font-semibold"
+            >
+              Sign up
+            </Link>
+          </p>
         </div>
 
         {!showEmailForm ? (
           <>
-            {/* OAuth Providers */}
             <div className="space-y-3">
               {providers.map((provider) => (
                 <button
@@ -88,7 +124,6 @@ export default function LoginPage() {
               ))}
             </div>
 
-            {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-600"></div>
@@ -100,7 +135,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Email button */}
             <button
               onClick={() => setShowEmailForm(true)}
               className="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-3 transition shadow-sm cursor-pointer border border-slate-600"
@@ -111,7 +145,12 @@ export default function LoginPage() {
           </>
         ) : (
           <>
-            {/* Email/Password Form */}
+            {successMessage && (
+              <div className="mb-4 bg-green-500/10 border border-green-500 text-green-500 px-4 py-2 rounded-lg text-sm">
+                {successMessage}
+              </div>
+            )}
+
             <form onSubmit={handleEmailLogin} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -156,18 +195,17 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Back button */}
             <button
               onClick={() => {
                 setShowEmailForm(false);
                 setError("");
+                setSuccessMessage("");
               }}
               className="w-full mt-4 text-gray-400 hover:text-white text-sm transition cursor-pointer"
             >
               ← Back to other options
             </button>
 
-            {/* Sign up link */}
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-400">
                 Don't have an account?{" "}
