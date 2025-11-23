@@ -60,7 +60,7 @@ model User {
   username      String    @unique
   email         String?   @unique
   emailVerified DateTime?
-  password      String?   // ← Añadir esto
+  password      String?   
   displayName   String
   avatarUrl     String?
   bio           String?

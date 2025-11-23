@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { SignOutButton } from "@/components/SignOutButton";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -99,6 +100,12 @@ export default async function DashboardPage() {
         />
         <SignOutButton />
         </div>
+        <Link
+          href="/dashboard/platforms"
+          className="text-gray-300 hover:text-purple-400 transition"
+        >
+          Connect Platforms
+        </Link>
         
 
         {/* Clips List */}
