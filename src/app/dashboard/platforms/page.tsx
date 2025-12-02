@@ -4,6 +4,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ConnectPlatformButton } from "@/components/ConnectPlatformButton";
+import { ReconnectButton } from "@/components/ReconnectButton";
+import { DisconnectButton } from "@/components/DisconnectButton";
 
 export default async function PlatformsPage() {
   const session = await getServerSession(authOptions);
@@ -38,7 +40,7 @@ export default async function PlatformsPage() {
       icon: "🟣",
       color: "from-purple-500 to-purple-600",
       description: "Import clips and VODs from your Twitch channel",
-      available: false, // Coming soon
+      available: false,
     },
     {
       id: "VIMEO",
@@ -46,7 +48,7 @@ export default async function PlatformsPage() {
       icon: "🎬",
       color: "from-blue-500 to-blue-600",
       description: "Upload to Vimeo for professional hosting",
-      available: false, // Coming soon
+      available: false,
     },
   ];
 
@@ -61,7 +63,7 @@ export default async function PlatformsPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="text-gray-300 hover:text-white transition"
+              className="text-gray-300 hover:text-white transition cursor-pointer"
             >
               Dashboard
             </Link>
@@ -94,7 +96,7 @@ export default async function PlatformsPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
                     <div
-                      className={`w-16 h-16 rounded-lg bg-gradient-to-br ${platform.color} flex items-center justify-center text-3xl`}
+                      className={`w-16 h-16 rounded-lg bg-gradient-to-br ${platform.color} flex items-center justify-center text-3xl flex-shrink-0`}
                     >
                       {platform.icon}
                     </div>
@@ -106,32 +108,41 @@ export default async function PlatformsPage() {
                         {platform.description}
                       </p>
                       {connected && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <span className="text-green-400">● Connected</span>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-green-400">● Connected</span>
+                          </div>
                           {connected.channelName && (
-                            <span className="text-gray-400">
-                              as {connected.channelName}
-                            </span>
+                            <p className="text-sm text-gray-400">
+                              Channel: {connected.channelName}
+                            </p>
+                          )}
+                          {connected.lastSyncAt && (
+                            <p className="text-xs text-gray-500">
+                              Last synced:{" "}
+                              {new Date(connected.lastSyncAt).toLocaleString()}
+                            </p>
                           )}
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div>
+                  <div className="flex gap-2">
                     {!platform.available ? (
                       <span className="px-4 py-2 bg-slate-700 text-gray-400 rounded-lg text-sm">
                         Coming Soon
                       </span>
                     ) : connected ? (
-                      <div className="flex gap-2">
-                        <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition cursor-pointer">
-                          Reconnect
-                        </button>
-                        <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition cursor-pointer">
-                          Disconnect
-                        </button>
-                      </div>
+                      <>
+                        <ReconnectButton
+                          platform={platform.id as any}
+                        />
+                        <DisconnectButton
+                          platformConnectionId={connected.id}
+                          platformName={platform.name}
+                        />
+                      </>
                     ) : (
                       <ConnectPlatformButton
                         platform={platform.id as any}
@@ -155,6 +166,10 @@ export default async function PlatformsPage() {
             <li>• We only store metadata (title, tags, thumbnail URL)</li>
             <li>• You can disconnect at any time</li>
             <li>• Your credentials are encrypted and secure</li>
+            <li>
+              • Disconnecting removes access but doesn't delete videos from your
+              channel
+            </li>
           </ul>
         </div>
       </div>
