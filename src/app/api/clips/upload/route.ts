@@ -23,8 +23,9 @@ export async function POST(req: NextRequest) {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const game = formData.get("game") as string;
-    const tags = formData.get("tags") as string;
-    const visibility = formData.get("visibility") as string;
+    const tags = formData.get("tags") as string;    
+    const youtubeVisibility = formData.get("youtubeVisibility") as string;
+    const clipdexVisibility = formData.get("clipdexVisibility") as string;
     const platformConnectionId = formData.get("platformConnectionId") as string;
 
     // Validaciones
@@ -104,10 +105,10 @@ export async function POST(req: NextRequest) {
           title,
           description: description || `${game} gameplay clip uploaded via ClipDex`,
           tags: tagArray,
-          categoryId: "20", // Gaming category
+          categoryId: "20",
         },
         status: {
-          privacyStatus: visibility as "public" | "unlisted" | "private",
+          privacyStatus: youtubeVisibility as "public" | "unlisted" | "private", // ← YouTube privacy
         },
       },
       media: {
@@ -156,7 +157,8 @@ export async function POST(req: NextRequest) {
         thumbnailUrl,
         duration,
         viewCount: 0,
-        visibility: visibility.toUpperCase() as any,
+        youtubeVisibility: youtubeVisibility.toUpperCase() as any, // ← YouTube privacy
+        visibility: clipdexVisibility.toUpperCase() as any,        // ← ClipDex privacy
       },
     });
 

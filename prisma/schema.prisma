@@ -151,7 +151,10 @@ model Clip {
   
   // ClipDex metadata
   isFeatured        Boolean   @default(false)
-  visibility        Visibility @default(PUBLIC)
+  
+  // ✅ DOS VISIBILIDADES DIFERENTES
+  youtubeVisibility YoutubeVisibility @default(UNLISTED) // Privacidad en YouTube
+  visibility        ClipVisibility    @default(PUBLIC)   // Privacidad en ClipDex
   
   // Timestamps
   uploadedAt        DateTime  @default(now())
@@ -169,10 +172,18 @@ model Clip {
   @@map("clips")
 }
 
-enum Visibility {
+// Visibilidad en YouTube
+enum YoutubeVisibility {
   PUBLIC
   UNLISTED
   PRIVATE
+}
+
+// Visibilidad en ClipDex
+enum ClipVisibility {
+  PUBLIC    // Visible para todos en ClipDex
+  UNLISTED  // Solo con link directo
+  PRIVATE   // Solo tú lo ves
 }
 
 // ============================================
