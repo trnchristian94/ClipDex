@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { SignOutButton } from "@/components/SignOutButton";
+import { ClipsGrid } from "@/components/ClipsGrid";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -26,6 +27,15 @@ export default async function DashboardPage() {
   if (!user) {
     return <div>User not found</div>;
   }
+
+  const formattedClips = user.clips.map((clip) => ({
+    ...clip,
+    user: {
+      username: user.username,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+    },
+  }));
 
   const hasYouTube = user.platforms.some((p) => p.platform === "YOUTUBE");
 
@@ -155,41 +165,7 @@ export default async function DashboardPage() {
               )}
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {user.clips.map((clip) => (
-                <div
-                  key={clip.id}
-                  className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden hover:border-purple-500 transition cursor-pointer"
-                >
-                  <div className="relative aspect-video bg-slate-900">
-                    <img
-                      src={clip.thumbnailUrl}
-                      alt={clip.displayTitle}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs">
-                      {Math.floor(clip.duration / 60)}:
-                      {(clip.duration % 60).toString().padStart(2, "0")}
-                    </div>
-                    <div className="absolute top-2 left-2 bg-red-600 px-2 py-1 rounded text-xs flex items-center gap-1">
-                      🎥 {clip.platform}
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold mb-1 truncate">
-                      {clip.displayTitle}
-                    </h3>
-                    <p className="text-sm text-gray-400 mb-2">{clip.game}</p>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>👁️ {clip.viewCount} views</span>
-                      <span>
-                        {new Date(clip.uploadedAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ClipsGrid clips={formattedClips} />
           )}
         </div>
       </div>

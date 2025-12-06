@@ -1,30 +1,11 @@
+import { Header } from "@/components/Header";
 import Link from "next/link";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
-      {/* Header/Navbar */}
-      <header className="border-b border-slate-700 bg-slate-900/50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold">
-            🎮 <span className="text-purple-400">ClipDex</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/login"
-              className="text-gray-300 hover:text-white transition cursor-pointer"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/register"
-              className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg font-semibold transition cursor-pointer"
-            >
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* Header/Navbar */}      
+      <Header />
 
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">

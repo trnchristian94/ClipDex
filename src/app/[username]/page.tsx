@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
+import { ClipsGrid } from "@/components/ClipsGrid";
+import { Header } from "@/components/Header";
 
 interface ProfilePageProps {
   params: Promise<{
@@ -16,8 +18,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     where: { username },
     include: {
       clips: {
-        where: { 
-          visibility: "PUBLIC" // ✅ Solo clips públicos
+        where: {
+          visibility: "PUBLIC",
         },
         orderBy: { uploadedAt: "desc" },
       },
@@ -35,23 +37,29 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const games = new Set(user.clips.map((c) => c.game));
   const featuredClips = user.clips.filter((c) => c.isFeatured);
 
-  // Agrupar clips por juego
-  const clipsByGame = user.clips.reduce((acc, clip) => {
-    if (!acc[clip.game]) acc[clip.game] = [];
-    acc[clip.game].push(clip);
-    return acc;
-  }, {} as Record<string, typeof user.clips>);
+  // Formatear clips para el componente cliente
+  const formattedClips = user.clips.map((clip) => ({
+    ...clip,
+    user: {
+      username: user.username,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+    },
+  }));
+
+  const formattedFeaturedClips = featuredClips.map((clip) => ({
+    ...clip,
+    user: {
+      username: user.username,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+    },
+  }));
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
-      {/* Header */}
-      <header className="border-b border-slate-700 bg-slate-900/50">
-        <div className="container mx-auto px-4 py-4">
-          <Link href="/" className="text-2xl font-bold">
-            🎮 <span className="text-purple-400">ClipDex</span>
-          </Link>
-        </div>
-      </header>
+      {/* Header */}      
+      <Header />
 
       {/* Profile Header */}
       <div className="container mx-auto px-4 py-12">
@@ -141,11 +149,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
               ⭐ Featured Clips
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredClips.map((clip) => (
-                <ClipCard key={clip.id} clip={clip} />
-              ))}
-            </div>
+            <ClipsGrid clips={formattedFeaturedClips} />
           </div>
         )}
 
@@ -160,125 +164,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </div>
         ) : (
           <div>
-            <h2 className="text-2xl font-bold mb-6">All Clips</h2>
-
-            {/* Filter by Game */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              <button className="px-4 py-2 bg-purple-600 rounded-lg text-sm font-semibold cursor-pointer">
-                All ({user.clips.length})
-              </button>
-              {Array.from(games).map((game) => (
-                <button
-                  key={game}
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition cursor-pointer"
-                >
-                  {game} ({clipsByGame[game].length})
-                </button>
-              ))}
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {user.clips.map((clip) => (
-                <ClipCard key={clip.id} clip={clip} />
-              ))}
-            </div>
+            <ClipsGrid clips={formattedClips} title="All Clips" />
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-// Componente ClipCard
-function ClipCard({ clip }: { clip: any }) {
-  const platformColors = {
-    YOUTUBE: "bg-red-600",
-    TWITCH: "bg-purple-600",
-    VIMEO: "bg-blue-600",
-  };
-
-  const platformIcons = {
-    YOUTUBE: "🎥",
-    TWITCH: "🟣",
-    VIMEO: "🎬",
-  };
-
-  return (
-    <div className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden hover:border-purple-500 transition group cursor-pointer">
-      <div className="relative aspect-video bg-slate-900">
-        {/* Thumbnail */}
-        <Image
-          src={clip.thumbnailUrl}
-          alt={clip.displayTitle}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-
-        {/* Duration badge */}
-        <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs font-semibold">
-          {Math.floor(clip.duration / 60)}:
-          {(clip.duration % 60).toString().padStart(2, "0")}
-        </div>
-
-        {/* Platform badge */}
-        <div
-          className={`absolute top-2 left-2 ${
-            platformColors[clip.platform as keyof typeof platformColors]
-          } px-2 py-1 rounded text-xs flex items-center gap-1 font-semibold`}
-        >
-          {platformIcons[clip.platform as keyof typeof platformIcons]}
-          {clip.platform}
-        </div>
-
-        {/* Featured badge */}
-        {clip.isFeatured && (
-          <div className="absolute top-2 right-2 bg-yellow-500 px-2 py-1 rounded text-xs flex items-center gap-1 font-semibold text-black">
-            ⭐ Featured
-          </div>
-        )}
-
-        {/* Play overlay on hover */}
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-            <div className="w-0 h-0 border-l-[20px] border-l-black border-y-[12px] border-y-transparent ml-1"></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className="p-4">
-        <h3 className="font-bold mb-1 truncate group-hover:text-purple-400 transition">
-          {clip.displayTitle}
-        </h3>
-        <p className="text-sm text-gray-400 mb-2">{clip.game}</p>
-
-        {/* Tags */}
-        {clip.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-3">
-            {clip.tags.slice(0, 3).map((tag: string, i: number) => (
-              <span
-                key={i}
-                className="text-xs bg-purple-900/30 text-purple-300 px-2 py-1 rounded"
-              >
-                {tag}
-              </span>
-            ))}
-            {clip.tags.length > 3 && (
-              <span className="text-xs text-gray-500">
-                +{clip.tags.length - 3}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Stats */}
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          <span className="flex items-center gap-1">
-            👁️ {clip.viewCount.toLocaleString()} views
-          </span>
-          <span>{new Date(clip.uploadedAt).toLocaleDateString()}</span>
-        </div>
       </div>
     </div>
   );
