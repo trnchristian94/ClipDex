@@ -106,12 +106,20 @@ export default async function DashboardPage() {
         {/* Actions */}
         <div className="flex gap-4 mb-8">
           {hasYouTube ? (
-            <Link
-              href="/dashboard/upload"
-              className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold transition cursor-pointer"
-            >
-              📤 Upload New Clip
-            </Link>
+            <div>
+              <Link
+                href="/dashboard/upload"
+                className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold transition cursor-pointer"
+              >
+                📤 Upload New Clip
+              </Link>
+              <Link
+                href="/dashboard/import"
+                className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition cursor-pointer"
+              >
+                📥 Import from YouTube
+              </Link>
+            </div>
           ) : (
             <div className="flex items-center gap-4">
               <div className="bg-yellow-900/20 border border-yellow-600 px-6 py-3 rounded-lg">
