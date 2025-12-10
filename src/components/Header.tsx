@@ -2,9 +2,20 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Link from "next/link";
 import { SignOutButton } from "./SignOutButton";
+import { prisma } from "@/lib/prisma";
 
 export async function Header() {
   const session = await getServerSession(authOptions);
+
+  // Obtener el username del usuario logueado
+  let username = null;
+  if (session?.user?.email) {
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { username: true },
+    });
+    username = user?.username;
+  }
 
   return (
     <header className="border-b border-slate-700 bg-slate-900/50">
@@ -28,6 +39,14 @@ export async function Header() {
             >
               Platforms
             </Link>
+            {username && (
+              <Link
+                href={`/${username}`}
+                className="text-gray-300 hover:text-white transition cursor-pointer"
+              >
+                View Profile
+              </Link>
+            )}
             <SignOutButton />
           </div>
         ) : (

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ConnectPlatformButton } from "@/components/ConnectPlatformButton";
 import { ReconnectButton } from "@/components/ReconnectButton";
 import { DisconnectButton } from "@/components/DisconnectButton";
+import { Header } from "@/components/Header";
 
 export default async function PlatformsPage() {
   const session = await getServerSession(authOptions);
@@ -54,23 +55,7 @@ export default async function PlatformsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
-      {/* Header */}
-      <header className="border-b border-slate-700 bg-slate-900/50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="text-2xl font-bold">
-            🎮 <span className="text-purple-400">ClipDex</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard"
-              className="text-gray-300 hover:text-white transition cursor-pointer"
-            >
-              Dashboard
-            </Link>
-            <span className="text-gray-300">{user.displayName}</span>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -136,7 +121,7 @@ export default async function PlatformsPage() {
                     ) : connected ? (
                       <>
                         <ReconnectButton
-                          platform={platform.id as any}
+                          platform={platform.id as "YOUTUBE" | "TWITCH" | "VIMEO"}
                         />
                         <DisconnectButton
                           platformConnectionId={connected.id}
@@ -145,7 +130,7 @@ export default async function PlatformsPage() {
                       </>
                     ) : (
                       <ConnectPlatformButton
-                        platform={platform.id as any}
+                        platform={platform.id as "YOUTUBE" | "TWITCH" | "VIMEO"}
                         userId={user.id}
                       />
                     )}

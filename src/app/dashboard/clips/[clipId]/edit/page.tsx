@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { EditClipForm } from "@/components/EditClipForm";
+import { Header } from "@/components/Header";
 
 interface EditClipPageProps {
   params: Promise<{
@@ -42,19 +43,7 @@ export default async function EditClipPage({ params }: EditClipPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
-      <header className="border-b border-slate-700 bg-slate-900/50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="text-2xl font-bold">
-            🎮 <span className="text-purple-400">ClipDex</span>
-          </Link>
-          <Link
-            href="/dashboard"
-            className="text-gray-300 hover:text-white transition cursor-pointer"
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="mb-8">

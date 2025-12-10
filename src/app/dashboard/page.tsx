@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { SignOutButton } from "@/components/SignOutButton";
 import { ClipsGrid } from "@/components/ClipsGrid";
+import { Header } from "@/components/Header";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -41,30 +42,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
-      {/* Header */}
-      <header className="border-b border-slate-700 bg-slate-900/50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="text-2xl font-bold">
-            🎮 <span className="text-purple-400">ClipDex</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard/platforms"
-              className="text-gray-300 hover:text-purple-400 transition cursor-pointer"
-            >
-              Platforms
-            </Link>
-            <Link
-              href={`/${user.username}`}
-              className="text-gray-300 hover:text-purple-400 transition cursor-pointer"
-            >
-              View Profile
-            </Link>
-            <span className="text-gray-300">{user.displayName}</span>
-            <SignOutButton />
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
@@ -109,7 +87,7 @@ export default async function DashboardPage() {
             <div>
               <Link
                 href="/dashboard/upload"
-                className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold transition cursor-pointer"
+                className="bg-purple-600 hover:bg-purple-700 px-6 py-3 mr-2 rounded-lg font-semibold transition cursor-pointer"
               >
                 📤 Upload New Clip
               </Link>
@@ -135,14 +113,6 @@ export default async function DashboardPage() {
               </Link>
             </div>
           )}
-
-          <Link
-            href={`/${user.username}`}
-            target="_blank"
-            className="border border-purple-400 hover:bg-purple-900/30 px-6 py-3 rounded-lg font-semibold transition cursor-pointer"
-          >
-            👁️ View Public Profile
-          </Link>
         </div>
 
         {/* Clips List */}
